@@ -27,7 +27,7 @@ import (
 
 	"github.com/SeTriones/groupcache/consistenthash"
 	pb "github.com/SeTriones/groupcache/groupcachepb"
-	"github.com/SeTriones/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 const defaultBasePath = "/_groupcache/"
