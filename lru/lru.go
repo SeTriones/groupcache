@@ -53,7 +53,7 @@ func New(maxEntries int) *Cache {
 }
 
 // Add adds a value to the cache.
-func (c *Cache) Add(key Key, value interface{}) {
+func (c *Cache) Add(key Key, value interface{}) (removedKey interface{}, removedValue interface{}) {
 	if c.cache == nil {
 		c.cache = make(map[interface{}]*list.Element)
 		c.ll = list.New()
@@ -66,8 +66,9 @@ func (c *Cache) Add(key Key, value interface{}) {
 	ele := c.ll.PushFront(&entry{key, value})
 	c.cache[key] = ele
 	if c.MaxEntries != 0 && c.ll.Len() > c.MaxEntries {
-		c.RemoveOldest()
+		return c.RemoveOldest()
 	}
+	return nil, nil
 }
 
 // Get looks up a key's value from the cache.
@@ -93,14 +94,18 @@ func (c *Cache) Remove(key Key) {
 }
 
 // RemoveOldest removes the oldest item from the cache.
-func (c *Cache) RemoveOldest() {
+func (c *Cache) RemoveOldest() (removedKey interface{}, removedValue interface{}) {
 	if c.cache == nil {
 		return
 	}
 	ele := c.ll.Back()
 	if ele != nil {
 		c.removeElement(ele)
+		removedEntry := ele.Value.(*entry)
+		removedKey = removedEntry.key
+		removedValue = removedEntry.value
 	}
+	return nil, nil
 }
 
 func (c *Cache) removeElement(e *list.Element) {
