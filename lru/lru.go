@@ -17,7 +17,11 @@ limitations under the License.
 // Package lru implements an LRU cache.
 package lru
 
-import "container/list"
+import (
+	"container/list"
+	"fmt"
+	"os"
+)
 
 // Cache is an LRU cache. It is not safe for concurrent access.
 type Cache struct {
@@ -66,6 +70,7 @@ func (c *Cache) Add(key Key, value interface{}) (removedKey interface{}, removed
 	ele := c.ll.PushFront(&entry{key, value})
 	c.cache[key] = ele
 	if c.MaxEntries != 0 && c.ll.Len() > c.MaxEntries {
+		fmt.Fprintf(os.Stderr, "cache evict\n")
 		return c.RemoveOldest()
 	}
 	return nil, nil
@@ -104,6 +109,8 @@ func (c *Cache) RemoveOldest() (removedKey interface{}, removedValue interface{}
 		removedEntry := ele.Value.(*entry)
 		removedKey = removedEntry.key
 		removedValue = removedEntry.value
+		fmt.Fprintf(os.Stderr, "del list back,k=%v\n", removedKey)
+		return
 	}
 	return nil, nil
 }
